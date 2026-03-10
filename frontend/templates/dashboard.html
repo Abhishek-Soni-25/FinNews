@@ -1,0 +1,105 @@
+{% extends "base.html" %} {% block title %} FinNews {% endblock %} {% block
+style %}
+<style>
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    height: 100vh;
+    width: 100vw;
+    background: #111;
+    display: flex;
+    font-family: 'Space Grotesk', sans-serif;
+  }
+
+  .outer {
+    width: 100vw;
+    height: 100vh;
+    border: 1.8px solid rgba(255, 255, 255, 0.35);
+    border-radius: 0;
+    background: #161616;
+    display: flex;
+    overflow: hidden;
+  }
+
+  /* Sidebar */
+  .sidebar {
+    min-width: fit-content;
+    border-right: 1.8px solid rgba(255, 255, 255, 0.3);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 20px 16px 20px;
+  }
+
+  .nav {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .nav a {
+    color: #e0e0e0;
+    font-size: 1.25rem;
+    font-weight: 400;
+    text-decoration: none;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+
+  .nav a:hover {
+    opacity: 0.6;
+  }
+
+  .user-name {
+    color: #e0e0e0;
+    font-size: 1.25rem;
+    font-weight: 400;
+  }
+
+  /* Main content */
+  .main {
+    flex: 1;
+    display: flex;
+    padding: 20px 24px 24px;
+    align-items: center;
+    text-align: center;
+  }
+
+  .chat-area {
+    flex: 1;
+    color: #c8c8c8;
+    font-size: 2.15rem;
+    /* empty chat space */
+  }
+
+  .send-btn {
+    height: 44px;
+    padding: 0 18px;
+    background: transparent;
+    border: 1.8px solid rgba(255, 255, 255, 0.55);
+    border-radius: 10px;
+    color: #e0e0e0;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: background 0.2s;
+    white-space: nowrap;
+  }
+
+  .send-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
+</style>
+{% endblock %} {% block content %}
+<div class="chat-area">
+  <b>Welcome {{name}},</b>
+  <br />
+  FinNews: Real-Time Finance ChatBot
+</div>
+{% endblock %}

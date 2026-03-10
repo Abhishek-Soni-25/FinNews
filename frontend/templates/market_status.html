@@ -1,0 +1,204 @@
+{% extends "base.html" %} {% block title %} FinNews - Market Status {% endblock
+%} {% block style %}
+<style>
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    height: 100vh;
+    width: 100vw;
+    background: #111;
+    display: flex;
+    font-family: "Space Grotesk", sans-serif;
+  }
+
+  .outer {
+    width: 100vw;
+    height: 100vh;
+    border: 1.8px solid rgba(255, 255, 255, 0.35);
+    border-radius: 0;
+    background: #161616;
+    display: flex;
+    overflow: hidden;
+  }
+
+  /* Sidebar */
+  .sidebar {
+    min-width: fit-content;
+    border-right: 1.8px solid rgba(255, 255, 255, 0.3);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 20px 16px 20px;
+  }
+
+  .nav {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .nav a {
+    color: #e0e0e0;
+    font-size: 1.25rem;
+    font-weight: 400;
+    text-decoration: none;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+
+  .nav a:hover {
+    opacity: 0.6;
+  }
+
+  .user-name {
+    color: #e0e0e0;
+    font-size: 1.25rem;
+    font-weight: 400;
+  }
+
+  /* Main content */
+  .main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 20px 24px 24px;
+    overflow: hidden;
+  }
+
+  .table-wrapper {
+    flex: 1;
+    border: 1.8px solid rgba(255, 255, 255, 0.45);
+    border-radius: 14px;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  table {
+    width: 100%;
+    height: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+  }
+
+  thead tr {
+    border-bottom: 1.8px solid rgba(255, 255, 255, 0.45);
+  }
+
+  th {
+    color: #e0e0e0;
+    font-family: "Space Grotesk", sans-serif;
+    font-size: 1.2rem;
+    font-weight: 600;
+    text-align: center;
+    padding: 12px 8px;
+    border-right: 1.8px solid rgba(255, 255, 255, 0.35);
+  }
+
+  th:last-child {
+    border-right: none;
+  }
+
+  td {
+    border-right: 1.8px solid rgba(255, 255, 255, 0.35);
+    border-top: 1.8px solid rgba(255, 255, 255, 0.35);
+    padding: 8px;
+    color: #c8c8c8;
+    font-family: "Space Grotesk", sans-serif;
+    font-size: 1.1rem;
+    text-align: center;
+  }
+
+  td:last-child {
+    border-right: none;
+  }
+
+  tbody tr:first-child td {
+    border-top: none;
+  }
+
+  .table-wrapper::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .table-wrapper::-webkit-scrollbar-track {
+    background: #161616;
+  }
+
+  .table-wrapper::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.25);
+    border-radius: 10px;
+    transition: background 0.3s;
+  }
+
+  .table-wrapper::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.45);
+  }
+</style>
+{% endblock %} {% block content %}
+<div class="table-wrapper">
+  <table>
+    <thead>
+      <tr>
+        <th>market</th>
+        <th>region</th>
+        <th>open_time</th>
+        <th>close_time</th>
+        <th>current_status</th>
+      </tr>
+    </thead>
+    <tbody id="marketTableBody"></tbody>
+  </table>
+</div>
+{% endblock %} {% block scripts %}
+<script>
+  const tableBody = document.getElementById("marketTableBody");
+
+  let marketDataLoaded = false;
+
+  // Load automatically when page is ready
+  document.addEventListener("DOMContentLoaded", function () {
+    loadMarketStatus();
+  });
+
+  function loadMarketStatus() {
+    if (marketDataLoaded) return;
+
+    fetch(
+      "https://www.alphavantage.co/query?function=MARKET_STATUS&apikey=demo",
+    )
+      .then((response) => response.json())
+      .then((data) => {
+        tableBody.innerHTML = "";
+
+        const markets = data.markets;
+
+        markets.forEach((market) => {
+          const row = document.createElement("tr");
+
+          row.innerHTML = `
+            <td>${market.market_type}</td>
+            <td>${market.region}</td>
+            <td>${market.local_open}</td>
+            <td>${market.local_close}</td>
+            <td style="color:${market.current_status === "open" ? "#00ff88" : "#ff4d4d"}">
+              ${market.current_status}
+            </td>
+          `;
+
+          tableBody.appendChild(row);
+        });
+
+        marketDataLoaded = true;
+      })
+      .catch((error) => {
+        console.error("Error fetching market status:", error);
+      });
+  }
+</script>
+{% endblock %}

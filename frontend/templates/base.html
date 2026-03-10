@@ -1,0 +1,62 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}FinNews{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cascadia+Mono:ital,wght@0,200..700;1,200..700&family=Exo+2:ital,wght@0,100..900;1,100..900&family=Space+Grotesk:wght@300..700&display=swap" rel="stylesheet">
+    {% block style %}{% endblock %}
+    <style>
+      .chat-history {
+        margin-top: 20px;
+        flex-grow: 1;
+        overflow-y: auto;
+      }
+
+      .chat-box {
+        display: block;
+        padding: 10px;
+        margin-bottom: 8px;
+        background: #2a2a3d;
+        border-radius: 6px;
+        text-decoration: none;
+        color: white;
+        font-size: 14px;
+        transition: 0.2s;
+      }
+
+      .chat-box:hover {
+        background: #4a4a70;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="outer">
+      <!-- Sidebar -->
+      <div class="sidebar">
+        <nav class="nav">
+          <a href="/new_chat">New Chat</a>
+          <a href="/ticker_search">Search Ticker</a>
+          <a href="/market_status">Market Status</a>
+        </nav>
+
+        <!-- Chat History -->
+        <div class="chat-history">
+          {% for session in sessions %}
+          <a class="chat-box" href="/chat/{{ session.id }}">
+            {{ session.title or "Untitled Chat" }}...
+          </a>
+          {% endfor %}
+        </div>
+
+        <div class="user-name">{{ name }}</div>
+      </div>
+
+      <!-- Main content -->
+      <div class="main">{% block content %}{% endblock %}</div>
+    </div>
+    {% block scripts %}{% endblock %}
+  </body>
+</html>

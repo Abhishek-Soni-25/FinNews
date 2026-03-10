@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Signup</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cascadia+Mono:ital,wght@0,200..700;1,200..700&family=Exo+2:ital,wght@0,100..900;1,100..900&family=Space+Grotesk:wght@300..700&display=swap" rel="stylesheet">
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        min-height: 100vh;
+        background: #1a1a1a;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: 'Space Grotesk', sans-serif;
+      }
+
+      .outer {
+        width: 100vw;
+        height: 100vh;
+        border: 1.8px solid rgba(255, 255, 255, 0.35);
+        border-radius: 0;
+        background: #161616;
+        display: flex;
+        overflow: hidden;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .card {
+        width: 350px;
+        padding: 20px 26px 26px;
+        border: 1.8px solid rgba(255, 255, 255, 0.5);
+        border-radius: 20px;
+        background: transparent;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .card-title {
+        color: #e8e8e8;
+        font-size: 2.5rem;
+        font-weight: 400;
+        text-align: center;
+        margin-bottom: 35px;
+        letter-spacing: 0.3px;
+      }
+
+      .field {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 12px;
+      }
+
+      label {
+        color: #d8d8d8;
+        font-size: 1.4rem;
+        font-weight: 400;
+        margin-bottom: 5px;
+      }
+
+      input {
+        width: 100%;
+        height: 38px;
+        background: #1e1e1e;
+        border: 1.8px solid rgba(255, 255, 255, 0.55);
+        border-radius: 7px;
+        outline: none;
+        color: #fff;
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 1rem;
+        padding: 0 10px;
+        transition: border-color 0.2s;
+      }
+
+      input:focus {
+        border-color: rgba(255, 255, 255, 0.9);
+      }
+
+      .submit-btn {
+        margin-top: 20px;
+        width: 100%;
+        height: 42px;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1.8px solid rgba(255, 255, 255, 0.55);
+        border-radius: 7px;
+        color: #e8e8e8;
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 1.4rem;
+        font-weight: 600;
+        cursor: pointer;
+        letter-spacing: 0.5px;
+        transition:
+          background 0.2s,
+          opacity 0.2s;
+      }
+
+      .submit-btn:hover {
+        background: rgba(255, 255, 255, 0.2);
+      }
+
+      .login-row {
+        margin-top: 25px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        color: #a0a0a0;
+        font-size: 1.2rem;
+        justify-content: center;
+      }
+
+      .login-btn {
+        background: transparent;
+        border: none;
+        color: #e8e8e8;
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 1.1rem;
+        font-weight: 400;
+        cursor: pointer;
+        letter-spacing: 0.3px;
+        transition: opacity 0.2s;
+        padding: 0;
+      }
+
+      .login-btn:hover {
+        opacity: 0.65;
+      }
+    </style>
+  </head>
+  <body>
+    {% if validation_error %}
+    <script>
+      alert("{{ validation_error | tojson }}");
+    </script>
+    {% endif %}
+    {% if db_error %}
+    <script>
+      alert("{{ db_error | tojson }}");
+    </script>
+    {% endif %}
+    <div class="outer">
+      <div class="card">
+        <div class="card-title">Signup</div>
+        <form action="{{ url_for('signup') }}" method="post">
+          <div class="field">
+            <label>Username</label>
+            <input
+              type="name"
+              name="name"
+              autocomplete="name"
+              required
+              maxlength="50"
+              value="{{ old_data.name if old_data }}"
+            />
+          </div>
+
+          <div class="field">
+            <label>Email</label>
+            <input
+              type="email"
+              name="email"
+              autocomplete="email"
+              required
+              value="{{ old_data.email if old_data }}"
+            />
+          </div>
+
+          <div class="field">
+            <label>Password</label>
+            <input
+              type="password"
+              name="password"
+              autocomplete="current-password"
+              required
+              minlength="8"
+            />
+          </div>
+
+          <button type="submit" class="submit-btn">Signup</button>
+        </form>
+        <div class="login-row">
+          Already have an account?
+          <a href="/login"> <button class="login-btn">Login</button> </a>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,255 @@
+{% extends "base.html" %} {% block title %} FinNews - New Chat {% endblock %} {%
+block style %}
+<style>
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    height: 100vh;
+    width: 100vw;
+    background: #111;
+    display: flex;
+    font-family: 'Space Grotesk', sans-serif;
+  }
+
+  .outer {
+    width: 100vw;
+    height: 100vh;
+    border: 1.8px solid rgba(255, 255, 255, 0.35);
+    border-radius: 0;
+    background: #161616;
+    display: flex;
+    overflow: hidden;
+  }
+
+  /* Sidebar */
+  .sidebar {
+    min-width: fit-content;
+    border-right: 1.8px solid rgba(255, 255, 255, 0.3);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 20px 16px 20px;
+  }
+
+  .nav {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .nav a {
+    color: #e0e0e0;
+    font-size: 1.25rem;
+    font-weight: 400;
+    text-decoration: none;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+
+  .nav a:hover {
+    opacity: 0.6;
+  }
+
+  .user-name {
+    color: #e0e0e0;
+    font-size: 1.25rem;
+    font-weight: 400;
+  }
+
+  /* Main content */
+  .main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 20px 24px 24px;
+  }
+
+  .chat-area {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    color: #c8c8c8;
+    font-size: 1.15rem;
+    margin-bottom: 15px;
+  }
+
+  .input-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .chat-input {
+    flex: 1;
+    height: 44px;
+    background: transparent;
+    border: 1.8px solid rgba(255, 255, 255, 0.55);
+    border-radius: 10px;
+    outline: none;
+    color: #c8c8c8;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.2rem;
+    padding: 0 16px;
+    transition: border-color 0.2s;
+  }
+
+  .chat-input::placeholder {
+    color: #888;
+  }
+
+  .chat-input:focus {
+    border-color: rgba(255, 255, 255, 0.85);
+  }
+
+  .send-btn {
+    height: 44px;
+    padding: 0 18px;
+    background: transparent;
+    border: 1.8px solid rgba(255, 255, 255, 0.55);
+    border-radius: 10px;
+    color: #e0e0e0;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: background 0.2s;
+    white-space: nowrap;
+  }
+
+  .send-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  .message {
+    max-width: 70%;
+    padding: 10px 14px;
+    border-radius: 12px;
+    line-height: 1.4;
+    word-wrap: break-word;
+  }
+
+  .user-message {
+    align-self: flex-end;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #7dd3fc; /* light blue */
+  }
+
+  .bot-message {
+    align-self: flex-start;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #e0e0e0;
+  }
+  .chat-area::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .chat-area::-webkit-scrollbar-track {
+    background: #161616;
+  }
+
+  .chat-area::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.25);
+    border-radius: 10px;
+    transition: background 0.3s;
+  }
+
+  .chat-area::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.45);
+  }
+</style>
+{% endblock %} {% block content %}
+<div class="chat-area">
+  {% if data %} {% for role, content in data %}
+  <div
+    class="message {% if role == 'user' %}user-message{% else %}bot-message{% endif %}"
+  >
+    {{ content }}
+  </div>
+  {% endfor %} {% endif %}
+</div>
+<div class="input-row">
+  <input
+    class="chat-input"
+    type="text"
+    placeholder="Ask questions"
+    id="chatInput"
+    autocomplete="off"
+  />
+</div>
+{% endblock %} {% block scripts %}
+<script>
+        const input = document.getElementById("chatInput");
+        const chatArea = document.querySelector(".chat-area");
+        const sessionId = {{ session_id | tojson }};
+
+        // Load previous messages on page load
+        window.onload = function () {
+            chatArea.scrollTop = chatArea.scrollHeight;
+        };
+
+        input.addEventListener("keydown", function (event) {
+          if (event.key === "Enter") {
+            event.preventDefault();
+
+            const query = input.value.trim();
+            if (!query) return;
+
+            const userMessage = document.createElement("div");
+            userMessage.classList.add("message", "user-message");
+            userMessage.textContent = query;
+            chatArea.appendChild(userMessage);
+
+            fetch(`/query/${sessionId}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ q: query })
+  })
+  .then(async (response) => {
+    const data = await response.json();
+
+    if (!response.ok) {
+      // Remove the temporary user message if request failed
+      chatArea.removeChild(userMessage);
+
+      alert(data.response || "Something went wrong");
+      throw new Error(data.response);
+    }
+
+    return data;
+  })
+  .then((data) => {
+    const botMessage = document.createElement("div");
+    botMessage.classList.add("message", "bot-message");
+    botMessage.textContent = data.response;
+    chatArea.appendChild(botMessage);
+    chatArea.scrollTop = chatArea.scrollHeight;
+    if (document.querySelector(".chat-box")?.innerText === "Untitled Chat") {
+      location.reload();
+  }
+  })
+  .catch((error) => {
+    console.error("Error:", error);
+  });
+
+            input.value = "";
+          }
+        });
+</script>
+{% if error %}
+<script>
+  alert({{ error | tojson }});
+</script>
+{% endif %} {% endblock %}

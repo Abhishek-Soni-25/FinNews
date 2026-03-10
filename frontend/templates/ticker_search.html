@@ -1,0 +1,199 @@
+{% extends "base.html" %}
+
+{% block title%}FinNews - Ticker Search{% endblock %}
+
+{% block style %}
+<style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        height: 100vh;
+        width: 100vw;
+        background: #111;
+        display: flex;
+        font-family: 'Space Grotesk', sans-serif;
+      }
+
+      .outer {
+        width: 100vw;
+        height: 100vh;
+        border: 1.8px solid rgba(255, 255, 255, 0.35);
+        border-radius: 0;
+        background: #161616;
+        display: flex;
+        overflow: hidden;
+      }
+
+      /* Sidebar */
+      .sidebar {
+        min-width: fit-content;
+        border-right: 1.8px solid rgba(255, 255, 255, 0.3);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 20px 16px 20px;
+      }
+
+      .nav {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .nav a {
+        color: #e0e0e0;
+        font-size: 1.25rem;
+        font-weight: 400;
+        text-decoration: none;
+        cursor: pointer;
+        transition: opacity 0.2s;
+      }
+
+      .nav a:hover {
+        opacity: 0.6;
+      }
+
+      .user-name {
+        color: #e0e0e0;
+        font-size: 1.25rem;
+        font-weight: 400;
+      }
+
+      /* Main content */
+      .main {
+        flex: 1;
+        display: flex;
+        padding: 20px 24px 24px;
+      }
+
+      .input-row {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        width: 100%;
+      }
+
+      .chat-input {
+        height: 44px;
+        background: transparent;
+        border: 1.8px solid rgba(255, 255, 255, 0.55);
+        border-radius: 10px;
+        outline: none;
+        color: #c8c8c8;
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 1.2rem;
+        padding: 0 16px;
+        transition: border-color 0.2s;
+        width: 100%;
+      }
+
+      .chat-input::placeholder {
+        color: #888;
+      }
+
+      .chat-input:focus {
+        border-color: rgba(255, 255, 255, 0.85);
+      }
+
+      .send-btn {
+        height: 44px;
+        padding: 0 18px;
+        background: transparent;
+        border: 1.8px solid rgba(255, 255, 255, 0.55);
+        border-radius: 10px;
+        color: #e0e0e0;
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 1.2rem;
+        cursor: pointer;
+        transition: background 0.2s;
+        white-space: nowrap;
+      }
+
+      .send-btn:hover {
+        background: rgba(255, 255, 255, 0.1);
+      }
+
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="input-row">
+          <div style="position: relative; width: 100%">
+            <input
+              id="searchInput"
+              class="chat-input"
+              type="text"
+              placeholder="Search ticker..."
+            />
+            <div
+              id="suggestions"
+              style="
+                position: absolute;
+                top: 48px;
+                width: 100%;
+                background: #ffffff;
+                border: 1px solid rgba(255, 255, 255, 0.3);
+                border-radius: 8px;
+                display: none;
+                max-height: 220px;
+                overflow-y: auto;
+              "
+            ></div>
+          </div>
+        </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+      const input = document.getElementById("searchInput");
+      const suggestionsBox = document.getElementById("suggestions");
+
+      let debounceTimer;
+
+      input.addEventListener("input", function () {
+        clearTimeout(debounceTimer);
+
+        debounceTimer = setTimeout(() => {
+          const query = input.value.trim();
+
+          if (!query) {
+            suggestionsBox.style.display = "none";
+            return;
+          }
+
+          fetch(`/api/search?q=${query}`)
+            .then((res) => res.json())
+            .then((data) => {
+              suggestionsBox.innerHTML = "";
+
+              if (data.length === 0) {
+                suggestionsBox.style.display = "none";
+                return;
+              }
+
+              data.forEach((item) => {
+                const div = document.createElement("div");
+                div.style.padding = "8px 12px";
+                div.style.cursor = "pointer";
+                div.innerHTML = `<strong>${item.symbol}</strong> - ${item.name}`;
+
+                div.addEventListener("click", () => {
+                  input.value = item.symbol;
+                  suggestionsBox.style.display = "none";
+                });
+
+                suggestionsBox.appendChild(div);
+              });
+
+              suggestionsBox.style.display = "block";
+            });
+        }, 300); // 300ms debounce
+      });
+    </script>
+{% endblock %}
