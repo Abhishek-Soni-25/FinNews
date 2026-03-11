@@ -89,9 +89,13 @@ Process:
 ## 🛠️ Tech Stack
 
 **Frontend** : HTML, CSS, JavaScript
+
 **Backend** : Python, Flask
+
 **AI / LLM** : Groq LLM, Mistral Embeddings, Retrieval-Augmented Generation
+
 **Databases** : PostgreSQL, Pinecone
+
 **Data Sources** : Alpha Vantage API, SEC EDGAR Filings
 
 ---
